@@ -6,7 +6,7 @@
 
     <groupId>ink.icoding.dnf</groupId>
     <artifactId>dnf-parser</artifactId>
-    <version>1.0</version>
+    <version>1.1</version><!-- version -->
     <packaging>pom</packaging>
     <name>dnf-parser</name>
     <description>dnf 资源文件解析器</description>

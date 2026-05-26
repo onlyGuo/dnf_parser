@@ -56,6 +56,7 @@ On top of the original implementation, this repository includes a fix for PVF te
 ## Features
 
 - Parse DNF `NPK` resources
+- Export decoded `NpkTexture` frames as PNG bytes via `toPngBytes()`
 - Parse DNF `PVF` directory trees and scripts
 - Read structured PVF script data as JSON
 - Read reconstructed PVF script source text via `loadScriptSource(...)`
@@ -76,7 +77,7 @@ If the artifacts are available from your Maven repository, add one of the follow
 <dependency>
     <groupId>ink.icoding.dnf</groupId>
     <artifactId>dnf-parser-npk</artifactId>
-    <version>1.0</version>
+    <version>1.1</version><!-- version -->
 </dependency>
 ```
 
@@ -86,7 +87,7 @@ If the artifacts are available from your Maven repository, add one of the follow
 <dependency>
     <groupId>ink.icoding.dnf</groupId>
     <artifactId>dnf-parser-pvf</artifactId>
-    <version>1.0</version>
+    <version>1.1</version><!-- version -->
 </dependency>
 ```
 
@@ -101,19 +102,29 @@ mvn clean package
 ### Parse an NPK image
 
 ```java
+import cn.hutool.core.io.FileUtil;
 import com.xiaoyouma.dnf.parser.npk.coder.NpkCoder;
 import com.xiaoyouma.dnf.parser.npk.model.NpkImg;
+import com.xiaoyouma.dnf.parser.npk.model.NpkTexture;
+
+import java.io.File;
 
 public class Demo {
     public static void main(String[] args) {
-        NpkCoder.initialize("D:/dnf/dof/DOF/ImagePacks2");
+        NpkCoder.initialize(new File("ImagePacks2").getAbsolutePath());
         NpkImg npkImg = NpkCoder.loadImg(
                 "sprite/character/swordman/equipment/avatar/skin/sm_body0000.img"
         );
         System.out.println(npkImg);
+
+        NpkTexture texture = npkImg.getTextures()[209];
+        byte[] pngBytes = texture.toPngBytes();
+        FileUtil.writeBytes(pngBytes, "/tmp/test.png");
     }
 }
 ```
+
+`toPngBytes()` is useful when you want to extract a single texture frame and save it directly as a PNG file without manually converting BGRA bytes.
 
 ### Parse a PVF script as JSON
 

@@ -7,6 +7,11 @@ import com.xiaoyouma.dnf.parser.npk.handle.HandleFactory;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 /**
  * npk 贴图
  *
@@ -89,6 +94,36 @@ public class NpkTexture {
             return linkTarget.getBgraData();
         } else {
             return HandleFactory.of(ImgVersion.of(img.getVersion())).convertData(this);
+        }
+    }
+
+    /**
+     * 转 png 字节数组
+     */
+    public byte[] toPngBytes() {
+        int width = getWidth();
+        int height = getHeight();
+        byte[] bgraData = getBgraData();
+
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        int offset = 0;
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int b = Byte.toUnsignedInt(bgraData[offset]);
+                int g = Byte.toUnsignedInt(bgraData[offset + 1]);
+                int r = Byte.toUnsignedInt(bgraData[offset + 2]);
+                int a = Byte.toUnsignedInt(bgraData[offset + 3]);
+                image.setRGB(x, y, (a << 24) | (r << 16) | (g << 8) | b);
+                offset += 4;
+            }
+        }
+
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            ImageIO.write(image, "png", outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("texture to png bytes fail", e);
         }
     }
 

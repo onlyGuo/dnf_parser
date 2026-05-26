@@ -56,6 +56,7 @@
 ## 功能特性
 
 - 解析 DNF `NPK` 资源
+- 通过 `toPngBytes()` 将 `NpkTexture` 导出为 PNG 字节数组
 - 解析 DNF `PVF` 文件树与脚本
 - 以 JSON 形式读取结构化 PVF 脚本
 - 通过 `loadScriptSource(...)` 读取重建后的 PVF 脚本文本
@@ -101,19 +102,29 @@ mvn clean package
 ### 解析 NPK 图片资源
 
 ```java
+import cn.hutool.core.io.FileUtil;
 import com.xiaoyouma.dnf.parser.npk.coder.NpkCoder;
 import com.xiaoyouma.dnf.parser.npk.model.NpkImg;
+import com.xiaoyouma.dnf.parser.npk.model.NpkTexture;
+
+import java.io.File;
 
 public class Demo {
     public static void main(String[] args) {
-        NpkCoder.initialize("D:/dnf/dof/DOF/ImagePacks2");
+        NpkCoder.initialize(new File("ImagePacks2").getAbsolutePath());
         NpkImg npkImg = NpkCoder.loadImg(
                 "sprite/character/swordman/equipment/avatar/skin/sm_body0000.img"
         );
         System.out.println(npkImg);
+
+        NpkTexture texture = npkImg.getTextures()[209];
+        byte[] pngBytes = texture.toPngBytes();
+        FileUtil.writeBytes(pngBytes, "/tmp/test.png");
     }
 }
 ```
+
+当你想把某一帧贴图直接导出成 PNG 文件时，`toPngBytes()` 会比手动处理 BGRA 数据更方便。
 
 ### 以 JSON 形式解析 PVF 脚本
 
